@@ -4,6 +4,7 @@ struct Node<T> {
     key: T,
     left: Option<Box<Self>>,
     right: Option<Box<Self>>,
+    size: usize,
 }
 impl<T> Node<T> {
     fn new(key: T) -> Self {
@@ -11,6 +12,7 @@ impl<T> Node<T> {
             key,
             left: None,
             right: None,
+            size: 1,
         }
     }
 }
@@ -20,7 +22,6 @@ where
     T: Ord,
 {
     root: Option<Box<Node<T>>>,
-    size: usize,
 }
 impl<T> SplayTree<T>
 where
@@ -29,7 +30,6 @@ where
     pub fn new() -> Self {
         SplayTree {
             root: None,
-            size: 0,
         }
     }
 }
