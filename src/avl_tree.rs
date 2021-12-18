@@ -33,15 +33,18 @@ impl<K, V> Node<K, V> {
     }
 }
 
-impl<K, V> Deref for NodePtr<K, V> {
-    type Target = NodePtrInner<K, V>;
-    fn deref(&self) -> &Self::Target {
-        &self.0
-    }
-}
-impl<K, V> DerefMut for NodePtr<K, V> {
-    fn deref_mut(&mut self) -> &mut Self::Target {
-        &mut self.0
+impl<'a, K, V> IntoIterator for &'a NodePtr<K, V> {
+    type Item = (&'a K, &'a V);
+    type IntoIter = std::vec::IntoIter<Self::Item>;
+
+    fn into_iter(self) -> Self::IntoIter {
+        let mut vec = Vec::new();
+        if let Some(node) = &self.0 {
+            vec.extend(node.left.into_iter());
+            vec.push((&node.key, &node.value));
+            vec.extend(node.right.into_iter());
+        }
+        vec.into_iter()
     }
 }
 impl<K, V> From<NodePtrInner<K, V>> for NodePtr<K, V> {
