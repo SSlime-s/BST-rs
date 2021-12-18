@@ -289,3 +289,28 @@ where
         todo!()
     }
 }
+
+pub struct AVLTree<K: Ord, V> {
+    root: NodePtr<K, V>,
+}
+impl<K: Ord, V> Deref for AVLTree<K, V> {
+    type Target = NodePtr<K, V>;
+    fn deref(&self) -> &Self::Target {
+        &self.root
+    }
+}
+impl<K: Ord, V> DerefMut for AVLTree<K, V> {
+    fn deref_mut(&mut self) -> &mut Self::Target {
+        &mut self.root
+    }
+}
+impl<K: Ord, V> AVLTree<K, V> {
+    pub fn new() -> Self {
+        AVLTree { root: None.into() }
+    }
+}
+impl<K: Ord, V> Default for AVLTree<K, V> {
+    fn default() -> Self {
+        Self::new()
+    }
+}
