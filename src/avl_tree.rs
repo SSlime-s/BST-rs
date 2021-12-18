@@ -9,9 +9,9 @@ enum ThreeWay {
     Equal,
 }
 
-type NodePtrInner<K, V> = Option<Box<Node<K, V>>>;
-struct NodePtr<K, V>(NodePtrInner<K, V>);
-struct Node<K, V> {
+pub type NodePtrInner<K, V> = Option<Box<Node<K, V>>>;
+pub struct NodePtr<K, V>(NodePtrInner<K, V>);
+pub struct Node<K, V> {
     key: K,
     value: V,
     left: NodePtr<K, V>,
