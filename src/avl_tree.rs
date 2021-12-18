@@ -276,11 +276,10 @@ where
         self.insert_rec(key, value).0
     }
 
-    fn remove(&mut self, key: K) -> Option<V> {
-        todo!()
+    fn remove(&mut self, key: &K) -> Option<V> {
     }
 
-    fn search(&self, key: K) -> Option<V> {
+    fn search(&self, key: &K) -> Option<V> {
         todo!()
     }
 
@@ -300,7 +299,7 @@ where
         todo!()
     }
 
-    fn order_of_key(&self, key: K) -> Option<usize> {
+    fn order_of_key(&self, key: &K) -> Option<usize> {
         todo!()
     }
 }
