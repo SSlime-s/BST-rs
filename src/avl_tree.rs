@@ -284,15 +284,31 @@ where
     }
 
     fn min(&self) -> Option<(&K, &V)> {
-        todo!()
+        match self.0.as_ref() {
+            Some(mut node) => {
+                while let Some(nxt) = node.left.0.as_ref() {
+                    node = nxt;
+                }
+                Some((&node.key, &node.value))
+            }
+            None => None,
+        }
     }
 
     fn max(&self) -> Option<(&K, &V)> {
-        todo!()
+        match self.0.as_ref() {
+            Some(mut node) => {
+                while let Some(nxt) = node.right.0.as_ref() {
+                    node = nxt;
+                }
+                Some((&node.key, &node.value))
+            }
+            None => None,
+        }
     }
 
     fn size(&self) -> usize {
-        todo!()
+        self.size()
     }
 
     fn find_by_order(&self, order: usize) -> Option<(&K, &V)> {
