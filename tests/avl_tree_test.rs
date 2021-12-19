@@ -91,3 +91,18 @@ fn remove_test_balanced() {
         vec![(1, 1), (2, 2), (3, 3), (5, 5), (6, 6), (7, 7)]
     );
 }
+
+#[test]
+fn remove_test_not_exists() {
+    let mut tree = AVLTree::new();
+    tree.insert(1, 1);
+    tree.insert(2, 2);
+    tree.insert(3, 3);
+    tree.insert(4, 4);
+    tree.insert(5, 5);
+    assert_eq!(tree.remove(&6), None);
+    assert_eq!(
+        tree.into_iter().map(|(&k, &v)| (k, v)).collect::<Vec<_>>(),
+        vec![(1, 1), (2, 2), (3, 3), (4, 4), (5, 5)]
+    );
+}
