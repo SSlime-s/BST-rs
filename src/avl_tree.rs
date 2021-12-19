@@ -546,7 +546,14 @@ where
     }
 
     fn search_mut(&mut self, key: &K) -> Option<&mut V> {
-        todo!()
+        match self.0.as_mut() {
+            None => None,
+            Some(node) => match key.cmp(&node.key) {
+                std::cmp::Ordering::Less => node.left.search_mut(key),
+                std::cmp::Ordering::Greater => node.right.search_mut(key),
+                std::cmp::Ordering::Equal => Some(&mut node.value),
+            },
+        }
     }
 
     fn min(&self) -> Option<(&K, &V)> {
