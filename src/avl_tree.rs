@@ -558,7 +558,7 @@ where
 
     fn min(&self) -> Option<(&K, &V)> {
         match self.0.as_ref() {
-            Some(node) => {
+            Some(mut node) => {
                 while let Some(nxt) = node.left.0.as_ref() {
                     node = nxt;
                 }
@@ -570,7 +570,7 @@ where
 
     fn max(&self) -> Option<(&K, &V)> {
         match self.0.as_ref() {
-            Some(node) => {
+            Some(mut node) => {
                 while let Some(nxt) = node.right.0.as_ref() {
                     node = nxt;
                 }
