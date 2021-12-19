@@ -96,6 +96,26 @@ impl<K, V> NodePtr<K, V> {
 
         *self = Some(right).into();
     }
+
+    pub fn keys(&self) -> Vec<&K> {
+        let mut vec = Vec::new();
+        if let Some(node) = &self.0 {
+            vec.extend(node.left.keys());
+            vec.push(&node.key);
+            vec.extend(node.right.keys());
+        }
+        vec
+    }
+
+    pub fn values(&self) -> Vec<&V> {
+        let mut vec = Vec::new();
+        if let Some(node) = &self.0 {
+            vec.extend(node.left.values());
+            vec.push(&node.value);
+            vec.extend(node.right.values());
+        }
+        vec
+    }
 }
 
 impl<K: Ord, V> NodePtr<K, V> {
@@ -645,5 +665,14 @@ impl<K: Ord, V> AVLTree<K, V> {
 impl<K: Ord, V> Default for AVLTree<K, V> {
     fn default() -> Self {
         Self::new()
+    }
+}
+impl<K: Ord, V> FromIterator<(K, V)> for AVLTree<K, V> {
+    fn from_iter<T: IntoIterator<Item = (K, V)>>(iter: T) -> Self {
+        let mut tree = Self::new();
+        for (key, value) in iter {
+            tree.insert(key, value);
+        }
+        tree
     }
 }
