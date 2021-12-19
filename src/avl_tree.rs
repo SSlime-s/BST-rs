@@ -635,14 +635,20 @@ where
         loop {
             match key.cmp(&node.key) {
                 std::cmp::Ordering::Less => {
-                    order += node.left.size();
-                    node = node.right.0.as_ref().unwrap();
+                    node = match node.left.0.as_ref() {
+                        Some(node) => node,
+                        None => break order,
+                    };
                 }
                 std::cmp::Ordering::Greater => {
-                    node = node.left.0.as_ref().unwrap();
+                    order += node.left.size() + 1;
+                    node = match node.right.0.as_ref() {
+                        Some(node) => node,
+                        None => break order,
+                    };
                 }
                 std::cmp::Ordering::Equal => {
-                    break order;
+                    break order + node.left.size();
                 }
             }
         }
