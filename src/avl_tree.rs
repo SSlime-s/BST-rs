@@ -616,7 +616,7 @@ where
         loop {
             match node.left.size().cmp(&rest) {
                 std::cmp::Ordering::Less => {
-                    rest -= node.left.size();
+                    rest -= node.left.size() + 1;
                     node = node.right.0.as_ref().unwrap();
                 }
                 std::cmp::Ordering::Greater => {
