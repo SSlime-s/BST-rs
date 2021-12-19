@@ -242,3 +242,32 @@ fn max_test_empty() {
     let tree: AVLTree<i32, i32> = AVLTree::new();
     assert_eq!(tree.max(), None);
 }
+
+#[test]
+fn size_test() {
+    let mut tree = AVLTree::new();
+    tree.insert(1, 1);
+    tree.insert(2, 2);
+    tree.insert(3, 3);
+    tree.insert(4, 4);
+    tree.insert(5, 5);
+    assert_eq!(tree.size(), 5);
+}
+
+#[test]
+fn size_test_after_removed() {
+    let mut tree = AVLTree::new();
+    tree.insert(1, 1);
+    tree.insert(2, 2);
+    tree.insert(3, 3);
+    tree.insert(4, 4);
+    tree.insert(5, 5);
+    tree.remove(&1);
+    assert_eq!(tree.size(), 4);
+}
+
+#[test]
+fn size_test_empty() {
+    let tree: AVLTree<i32, i32> = AVLTree::new();
+    assert_eq!(tree.size(), 0);
+}
