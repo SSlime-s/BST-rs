@@ -2,6 +2,13 @@ extern crate binary_search_tree;
 use binary_search_tree::{avl_tree::AVLTree, tree_trait::BinarySearchTree};
 
 #[test]
+fn into_iter_test_empty() {
+    let tree: AVLTree<i32, i32> = AVLTree::new();
+    let mut iter = tree.into_iter();
+    assert_eq!(iter.next(), None);
+}
+
+#[test]
 fn insert_test() {
     let mut tree = AVLTree::new();
     tree.insert(1, 1);
