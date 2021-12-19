@@ -266,6 +266,260 @@ impl<K: Ord, V> NodePtr<K, V> {
             }
         }
     }
+
+    fn remove_rec(&mut self, key: &K) -> (Option<(K, V)>, bool) {
+        let mut node = match self.0.take() {
+            Some(node) => node,
+            None => return (None, false),
+        };
+
+        match key.cmp(&node.key) {
+            std::cmp::Ordering::Equal => match (node.left.0.take(), node.right.0.take()) {
+                (None, None) => (Some((node.key, node.value)), true),
+                (Some(left), None) => {
+                    *self = Some(left).into();
+                    (Some((node.key, node.value)), true)
+                }
+                (None, Some(right)) => {
+                    *self = Some(right).into();
+                    (Some((node.key, node.value)), true)
+                }
+                (Some(left), Some(right)) => {
+                    let left = left;
+                    let right = right;
+                    let mut wrapped_left: NodePtr<_, _> = Some(left).into();
+                    let (value, decreased) = wrapped_left.remove_max_rec();
+                    let (mut key, mut value) = value.unwrap();
+                    std::mem::swap(&mut node.key, &mut key);
+                    std::mem::swap(&mut node.value, &mut value);
+                    node.size -= 1;
+                    node.left = wrapped_left;
+                    node.right = Some(right).into();
+                    if decreased {
+                        node.state = ThreeWay::Right;
+                    }
+                    *self = Some(node).into();
+                    (Some((key, value)), false)
+                }
+            },
+            std::cmp::Ordering::Greater => {
+                let (value, decreased) = node.right.remove_rec(key);
+                if value.is_none() {
+                    *self = Some(node).into();
+                    return (None, false);
+                }
+                node.size -= 1;
+                if !decreased {
+                    *self = Some(node).into();
+                    return (value, false);
+                }
+                match node.state {
+                    ThreeWay::Equal => {
+                        node.state = ThreeWay::Left;
+                        *self = Some(node).into();
+                        (value, false)
+                    }
+                    ThreeWay::Right => {
+                        node.state = ThreeWay::Equal;
+                        *self = Some(node).into();
+                        (value, true)
+                    }
+                    ThreeWay::Left => {
+                        *self = Some(node).into();
+                        (value, self.rebalanced_for_right_remove())
+                    }
+                }
+            }
+            std::cmp::Ordering::Less => {
+                let (value, decreased) = node.left.remove_rec(key);
+                if value.is_none() {
+                    *self = Some(node).into();
+                    return (None, false);
+                }
+                node.size -= 1;
+                if !decreased {
+                    *self = Some(node).into();
+                    return (value, false);
+                }
+                match node.state {
+                    ThreeWay::Equal => {
+                        node.state = ThreeWay::Right;
+                        *self = Some(node).into();
+                        (value, false)
+                    }
+                    ThreeWay::Left => {
+                        node.state = ThreeWay::Equal;
+                        *self = Some(node).into();
+                        (value, true)
+                    }
+                    ThreeWay::Right => {
+                        *self = Some(node).into();
+                        (value, self.rebalanced_for_left_remove())
+                    }
+                }
+            }
+        }
+    }
+
+    fn remove_max_rec(&mut self) -> (Option<(K, V)>, bool) {
+        let mut node = match self.0.take() {
+            Some(node) => node,
+            None => return (None, false),
+        };
+
+        match node.right.0.take() {
+            None => {
+                let left = node.left.0.take();
+                *self = left.into();
+                (Some((node.key, node.value)), true)
+            }
+            Some(right) => {
+                let mut wrapped_right: NodePtr<_, _> = Some(right).into();
+                let (ret, decreased) = wrapped_right.remove_max_rec();
+                node.right = wrapped_right;
+                node.size -= 1;
+                if !decreased {
+                    *self = Some(node).into();
+                    return (ret, false);
+                }
+
+                match node.state {
+                    ThreeWay::Equal => {
+                        node.state = ThreeWay::Left;
+                        *self = Some(node).into();
+                        (ret, false)
+                    }
+                    ThreeWay::Right => {
+                        node.state = ThreeWay::Equal;
+                        *self = Some(node).into();
+                        (ret, true)
+                    }
+                    ThreeWay::Left => {
+                        *self = Some(node).into();
+                        (ret, self.rebalanced_for_right_remove())
+                    }
+                }
+            }
+        }
+    }
+
+    // 左の子の削除操作によって、左の子の高さが右の子の高さより 2 低くなったときに呼ぶ
+    // 返り値は調整によって木の高さが低くなったかどうか
+    fn rebalanced_for_left_remove(&mut self) -> bool {
+        let mut node = self.0.take().unwrap();
+        let right_state = node.right.0.as_ref().unwrap().state;
+        match right_state {
+            ThreeWay::Equal => {
+                let mut wrapped_node: NodePtr<_, _> = Some(node).into();
+                wrapped_node.rotate_left();
+                let mut node = wrapped_node.0.take().unwrap();
+                node.state = ThreeWay::Equal;
+                *self = Some(node).into();
+                false
+            }
+            ThreeWay::Left => {
+                let mut wrapped_node: NodePtr<_, _> = Some(node).into();
+                wrapped_node.rotate_left();
+                let mut node = wrapped_node.0.take().unwrap();
+                node.state = ThreeWay::Equal;
+                if let Some(mut left) = node.left.0.as_mut() {
+                    left.state = ThreeWay::Equal;
+                }
+                *self = Some(node).into();
+                true
+            }
+            ThreeWay::Right => {
+                let state = node
+                    .right
+                    .0
+                    .as_ref()
+                    .unwrap()
+                    .left
+                    .0
+                    .as_ref()
+                    .unwrap()
+                    .state;
+                node.right.rotate_right();
+                let mut wrapped_node: NodePtr<_, _> = Some(node).into();
+                wrapped_node.rotate_left();
+                let mut node = wrapped_node.0.take().unwrap();
+                node.state = ThreeWay::Equal;
+                if let Some(mut left) = node.left.0.as_mut() {
+                    left.state = match state {
+                        ThreeWay::Left | ThreeWay::Equal => ThreeWay::Equal,
+                        ThreeWay::Right => ThreeWay::Right,
+                    };
+                }
+                if let Some(mut right) = node.right.0.as_mut() {
+                    right.state = match state {
+                        ThreeWay::Left => ThreeWay::Left,
+                        ThreeWay::Right | ThreeWay::Equal => ThreeWay::Equal,
+                    };
+                }
+                *self = Some(node).into();
+                true
+            }
+        }
+    }
+
+    // 右の子の削除操作によって、右の子の高さが左の子の高さより 2 低くなったときに呼ぶ
+    // 返り値は調整によって木の高さが低くなったかどうか
+    fn rebalanced_for_right_remove(&mut self) -> bool {
+        let mut node = self.0.take().unwrap();
+        let left_state = node.left.0.as_ref().unwrap().state;
+        match left_state {
+            ThreeWay::Equal => {
+                let mut wrapped_node: NodePtr<_, _> = Some(node).into();
+                wrapped_node.rotate_right();
+                let mut node = wrapped_node.0.take().unwrap();
+                node.state = ThreeWay::Equal;
+                *self = Some(node).into();
+                false
+            }
+            ThreeWay::Left => {
+                let mut wrapped_node: NodePtr<_, _> = Some(node).into();
+                wrapped_node.rotate_right();
+                let mut node = wrapped_node.0.take().unwrap();
+                node.state = ThreeWay::Equal;
+                if let Some(mut right) = node.right.0.as_mut() {
+                    right.state = ThreeWay::Equal;
+                }
+                *self = Some(node).into();
+                true
+            }
+            ThreeWay::Right => {
+                let state = node
+                    .left
+                    .0
+                    .as_ref()
+                    .unwrap()
+                    .right
+                    .0
+                    .as_ref()
+                    .unwrap()
+                    .state;
+                node.left.rotate_left();
+                let mut wrapped_node: NodePtr<_, _> = Some(node).into();
+                wrapped_node.rotate_right();
+                let mut node = wrapped_node.0.take().unwrap();
+                node.state = ThreeWay::Equal;
+                if let Some(mut left) = node.left.0.as_mut() {
+                    left.state = match state {
+                        ThreeWay::Left | ThreeWay::Equal => ThreeWay::Equal,
+                        ThreeWay::Right => ThreeWay::Left,
+                    };
+                }
+                if let Some(mut right) = node.right.0.as_mut() {
+                    right.state = match state {
+                        ThreeWay::Left => ThreeWay::Right,
+                        ThreeWay::Right | ThreeWay::Equal => ThreeWay::Equal,
+                    };
+                }
+                *self = Some(node).into();
+                true
+            }
+        }
+    }
 }
 
 impl<K, V> BinarySearchTree<K, V> for NodePtr<K, V>
@@ -277,6 +531,7 @@ where
     }
 
     fn remove(&mut self, key: &K) -> Option<V> {
+        self.remove_rec(key).0.map(|node| node.1)
     }
 
     fn search(&self, key: &K) -> Option<V> {
