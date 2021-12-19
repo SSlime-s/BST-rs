@@ -631,7 +631,10 @@ where
 
     fn order_of_key(&self, key: &K) -> usize {
         let mut order = 0;
-        let mut node = self.0.as_ref().unwrap();
+        let mut node = match self.0.as_ref() {
+            None => return 0,
+            Some(node) => node,
+        };
         loop {
             match key.cmp(&node.key) {
                 std::cmp::Ordering::Less => {
