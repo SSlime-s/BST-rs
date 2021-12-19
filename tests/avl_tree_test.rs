@@ -267,6 +267,22 @@ fn size_test_after_removed() {
 }
 
 #[test]
+fn size_test_all_removed() {
+    let mut tree = AVLTree::new();
+    tree.insert(1, 1);
+    tree.insert(2, 2);
+    tree.insert(3, 3);
+    tree.insert(4, 4);
+    tree.insert(5, 5);
+    tree.remove(&1);
+    tree.remove(&2);
+    tree.remove(&3);
+    tree.remove(&4);
+    tree.remove(&5);
+    assert_eq!(tree.size(), 0);
+}
+
+#[test]
 fn size_test_empty() {
     let tree: AVLTree<i32, i32> = AVLTree::new();
     assert_eq!(tree.size(), 0);
