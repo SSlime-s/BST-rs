@@ -585,7 +585,22 @@ where
     }
 
     fn find_by_order(&self, order: usize) -> Option<(&K, &V)> {
-        todo!()
+        if self.size() <= order {
+            return None;
+        }
+
+        let mut rest = order;
+        let mut node = self.0.as_ref().unwrap();
+        loop {
+            if node.left.size() == rest {
+                break Some((&node.key, &node.value));
+            } else if node.left.size() < rest {
+                rest -= node.left.size();
+                node = node.right.0.as_ref().unwrap();
+            } else {
+                node = node.left.0.as_ref().unwrap();
+            }
+        }
     }
 
     fn order_of_key(&self, key: &K) -> Option<usize> {
