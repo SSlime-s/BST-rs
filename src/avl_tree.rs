@@ -600,6 +600,10 @@ where
         self.size()
     }
 
+    fn is_empty(&self) -> bool {
+        self.0.is_none()
+    }
+
     fn find_by_order(&self, order: usize) -> Option<(&K, &V)> {
         if self.size() <= order {
             return None;
