@@ -1,7 +1,7 @@
 pub trait BinarySearchTree<K, V> {
     fn insert(&mut self, key: K, value: V) -> bool;
     fn remove(&mut self, key: &K) -> Option<V>;
-    fn search(&self, key: &K) -> Option<V>;
+    fn search(&self, key: &K) -> Option<&V>;
     fn min(&self) -> Option<(&K, &V)>;
     fn max(&self) -> Option<(&K, &V)>;
     fn size(&self) -> usize;
