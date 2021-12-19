@@ -287,3 +287,51 @@ fn size_test_empty() {
     let tree: AVLTree<i32, i32> = AVLTree::new();
     assert_eq!(tree.size(), 0);
 }
+
+#[test]
+fn find_by_order_test() {
+    let mut tree = AVLTree::new();
+    tree.insert(1, 1);
+    tree.insert(2, 2);
+    tree.insert(3, 3);
+    tree.insert(4, 4);
+    tree.insert(5, 5);
+    assert_eq!(tree.find_by_order(0), Some((&1, &1)));
+    assert_eq!(tree.find_by_order(1), Some((&2, &2)));
+    assert_eq!(tree.find_by_order(2), Some((&3, &3)));
+    assert_eq!(tree.find_by_order(3), Some((&4, &4)));
+    assert_eq!(tree.find_by_order(4), Some((&5, &5)));
+    assert_eq!(tree.find_by_order(5), None);
+}
+
+#[test]
+fn find_by_order_test_confused() {
+    let mut tree = AVLTree::new();
+    tree.insert(4, 4);
+    tree.insert(1, 1);
+    tree.insert(3, 3);
+    tree.insert(2, 2);
+    tree.insert(5, 5);
+    assert_eq!(tree.find_by_order(0), Some((&1, &1)));
+    assert_eq!(tree.find_by_order(1), Some((&2, &2)));
+    assert_eq!(tree.find_by_order(2), Some((&3, &3)));
+    assert_eq!(tree.find_by_order(3), Some((&4, &4)));
+    assert_eq!(tree.find_by_order(4), Some((&5, &5)));
+    assert_eq!(tree.find_by_order(5), None);
+}
+
+#[test]
+fn find_by_order_test_after_removed() {
+    let mut tree = AVLTree::new();
+    tree.insert(1, 1);
+    tree.insert(2, 2);
+    tree.insert(3, 3);
+    tree.insert(4, 4);
+    tree.insert(5, 5);
+    assert_eq!(tree.remove(&1), Some(1));
+    assert_eq!(tree.find_by_order(0), Some((&2, &2)));
+    assert_eq!(tree.find_by_order(1), Some((&3, &3)));
+    assert_eq!(tree.find_by_order(2), Some((&4, &4)));
+    assert_eq!(tree.find_by_order(3), Some((&5, &5)));
+    assert_eq!(tree.find_by_order(4), None);
+}
