@@ -534,7 +534,18 @@ where
         self.remove_rec(key).0.map(|node| node.1)
     }
 
-    fn search(&self, key: &K) -> Option<V> {
+    fn search(&self, key: &K) -> Option<&V> {
+        match self.0.as_ref() {
+            None => None,
+            Some(node) => match key.cmp(&node.key) {
+                std::cmp::Ordering::Less => node.left.search(key),
+                std::cmp::Ordering::Greater => node.right.search(key),
+                std::cmp::Ordering::Equal => Some(&node.value),
+            },
+        }
+    }
+
+    fn search_mut(&mut self, key: &K) -> Option<&mut V> {
         todo!()
     }
 
