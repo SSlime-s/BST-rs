@@ -10,5 +10,8 @@ pub trait BinarySearchTree<K, V> {
         self.size() == 0
     }
     fn find_by_order(&self, order: usize) -> Option<(&K, &V)>;
-    fn order_of_key(&self, key: &K) -> Option<usize>;
+    /**
+     * key 未満である要素の個数を返す
+     */
+    fn order_of_key(&self, key: &K) -> usize;
 }
