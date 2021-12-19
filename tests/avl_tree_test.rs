@@ -262,7 +262,7 @@ fn size_test_after_removed() {
     tree.insert(3, 3);
     tree.insert(4, 4);
     tree.insert(5, 5);
-    tree.remove(&1);
+    assert_eq!(tree.remove(&1), Some(1));
     assert_eq!(tree.size(), 4);
 }
 
