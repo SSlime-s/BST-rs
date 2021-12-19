@@ -28,3 +28,66 @@ fn insert_test_confused() {
         vec![(1, 1), (2, 2), (3, 3), (4, 4), (5, 5)]
     );
 }
+
+#[test]
+fn insert_test_balanced() {
+    let mut tree = AVLTree::new();
+    tree.insert(4, 4);
+    tree.insert(2, 2);
+    tree.insert(6, 6);
+    tree.insert(1, 1);
+    tree.insert(3, 3);
+    tree.insert(5, 5);
+    tree.insert(7, 7);
+    assert_eq!(
+        tree.into_iter().map(|(&k, &v)| (k, v)).collect::<Vec<_>>(),
+        vec![(1, 1), (2, 2), (3, 3), (4, 4), (5, 5), (6, 6), (7, 7)]
+    );
+}
+
+#[test]
+fn remove_test() {
+    let mut tree = AVLTree::new();
+    tree.insert(1, 1);
+    tree.insert(2, 2);
+    tree.insert(3, 3);
+    tree.insert(4, 4);
+    tree.insert(5, 5);
+    tree.remove(&3);
+    assert_eq!(
+        tree.into_iter().map(|(&k, &v)| (k, v)).collect::<Vec<_>>(),
+        vec![(1, 1), (2, 2), (4, 4), (5, 5)]
+    );
+}
+
+#[test]
+fn remove_test_confused() {
+    let mut tree = AVLTree::new();
+    tree.insert(4, 4);
+    tree.insert(1, 1);
+    tree.insert(3, 3);
+    tree.insert(2, 2);
+    tree.insert(5, 5);
+    tree.remove(&4);
+    assert_eq!(
+        tree.into_iter().map(|(&k, &v)| (k, v)).collect::<Vec<_>>(),
+        vec![(1, 1), (2, 2), (3, 3), (5, 5)]
+    );
+}
+
+#[test]
+fn remove_test_balanced() {
+    let mut tree = AVLTree::new();
+    tree.insert(4, 4);
+    tree.insert(2, 2);
+    tree.insert(6, 6);
+    tree.insert(1, 1);
+    tree.insert(3, 3);
+    tree.insert(5, 5);
+    tree.insert(7, 7);
+    tree.remove(&4);
+    assert_eq!(
+        tree.into_iter().map(|(&k, &v)| (k, v)).collect::<Vec<_>>(),
+        vec![(1, 1), (2, 2), (3, 3), (5, 5), (6, 6), (7, 7)]
+    );
+}
