@@ -592,13 +592,17 @@ where
         let mut rest = order;
         let mut node = self.0.as_ref().unwrap();
         loop {
-            if node.left.size() == rest {
-                break Some((&node.key, &node.value));
-            } else if node.left.size() < rest {
-                rest -= node.left.size();
-                node = node.right.0.as_ref().unwrap();
-            } else {
-                node = node.left.0.as_ref().unwrap();
+            match node.left.size().cmp(&rest) {
+                std::cmp::Ordering::Less => {
+                    rest -= node.left.size();
+                    node = node.right.0.as_ref().unwrap();
+                }
+                std::cmp::Ordering::Greater => {
+                    node = node.left.0.as_ref().unwrap();
+                }
+                std::cmp::Ordering::Equal => {
+                    break Some((&node.key, &node.value));
+                }
             }
         }
     }
