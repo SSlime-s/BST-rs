@@ -335,3 +335,59 @@ fn find_by_order_test_after_removed() {
     assert_eq!(tree.find_by_order(3), Some((&5, &5)));
     assert_eq!(tree.find_by_order(4), None);
 }
+
+#[test]
+fn order_of_key_test() {
+    let mut tree = AVLTree::new();
+    tree.insert(1, 1);
+    tree.insert(2, 2);
+    tree.insert(4, 3);
+    tree.insert(8, 4);
+    tree.insert(16, 5);
+    assert_eq!(tree.order_of_key(&1), 0);
+    assert_eq!(tree.order_of_key(&2), 1);
+    assert_eq!(tree.order_of_key(&3), 2);
+    assert_eq!(tree.order_of_key(&4), 2);
+    assert_eq!(tree.order_of_key(&5), 3);
+    assert_eq!(tree.order_of_key(&16), 4);
+    assert_eq!(tree.order_of_key(&17), 5);
+}
+
+#[test]
+fn order_of_key_test_after_removed() {
+    let mut tree = AVLTree::new();
+    tree.insert(1, 1);
+    tree.insert(2, 2);
+    tree.insert(4, 3);
+    tree.insert(8, 4);
+    tree.insert(16, 5);
+    assert_eq!(tree.remove(&1), Some(1));
+    assert_eq!(tree.order_of_key(&2), 0);
+    assert_eq!(tree.order_of_key(&3), 1);
+    assert_eq!(tree.order_of_key(&4), 1);
+    assert_eq!(tree.order_of_key(&5), 2);
+    assert_eq!(tree.order_of_key(&16), 3);
+    assert_eq!(tree.order_of_key(&17), 4);
+}
+
+#[test]
+fn order_of_key_test_all_removed() {
+    let mut tree = AVLTree::new();
+    tree.insert(1, 1);
+    tree.insert(2, 2);
+    tree.insert(4, 3);
+    tree.insert(8, 4);
+    tree.insert(16, 5);
+    tree.remove(&1);
+    tree.remove(&2);
+    tree.remove(&4);
+    tree.remove(&8);
+    tree.remove(&16);
+    assert_eq!(tree.order_of_key(&1), 0);
+    assert_eq!(tree.order_of_key(&2), 0);
+    assert_eq!(tree.order_of_key(&3), 0);
+    assert_eq!(tree.order_of_key(&4), 0);
+    assert_eq!(tree.order_of_key(&5), 0);
+    assert_eq!(tree.order_of_key(&16), 0);
+    assert_eq!(tree.order_of_key(&17), 0);
+}
