@@ -68,10 +68,11 @@ impl<K, V> NodePtr<K, V> {
             None => return,
         };
 
+        let node_size = node.size;
         node.size = node.size - left.size + left.right.size();
         node.left = left.right.0.take().into();
 
-        left.size = left.size - left.right.size() + node.size;
+        left.size = node_size;
         left.right = Some(node).into();
 
         *self = Some(left).into();
@@ -88,10 +89,11 @@ impl<K, V> NodePtr<K, V> {
             None => return,
         };
 
+        let node_size = node.size;
         node.size = node.size - right.size + right.left.size();
         node.right = right.left.0.take().into();
 
-        right.size = right.size - right.left.size() + node.size;
+        right.size = node_size;
         right.left = Some(node).into();
 
         *self = Some(right).into();
