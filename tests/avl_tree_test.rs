@@ -128,3 +128,14 @@ fn search_test_not_exists() {
     tree.insert(5, 5);
     assert_eq!(tree.search(&6), None);
 }
+
+#[test]
+fn search_test_confused() {
+    let mut tree = AVLTree::new();
+    tree.insert(4, 4);
+    tree.insert(1, 1);
+    tree.insert(3, 3);
+    tree.insert(2, 2);
+    tree.insert(5, 5);
+    assert_eq!(tree.search(&4), Some(&4));
+}
