@@ -607,8 +607,23 @@ where
         }
     }
 
-    fn order_of_key(&self, key: &K) -> Option<usize> {
-        todo!()
+    fn order_of_key(&self, key: &K) -> usize {
+        let mut order = 0;
+        let mut node = self.0.as_ref().unwrap();
+        loop {
+            match key.cmp(&node.key) {
+                std::cmp::Ordering::Less => {
+                    order += node.left.size();
+                    node = node.right.0.as_ref().unwrap();
+                }
+                std::cmp::Ordering::Greater => {
+                    node = node.left.0.as_ref().unwrap();
+                }
+                std::cmp::Ordering::Equal => {
+                    break order;
+                }
+            }
+        }
     }
 }
 
