@@ -132,13 +132,13 @@ impl<K: Ord, V> NodePtr<K, V> {
 
         match key.cmp(&node.key) {
             std::cmp::Ordering::Less => {
-                let (left_inserted, left_changed) = node.left.insert_rec(key, value);
+                let (left_inserted, left_increased) = node.left.insert_rec(key, value);
                 if !left_inserted {
                     *self = Some(node).into();
                     return (false, false);
                 }
                 node.size += 1;
-                if !left_changed {
+                if !left_increased {
                     *self = Some(node).into();
                     return (true, false);
                 }
@@ -210,13 +210,13 @@ impl<K: Ord, V> NodePtr<K, V> {
                 (false, false)
             }
             std::cmp::Ordering::Greater => {
-                let (right_inserted, right_changed) = node.right.insert_rec(key, value);
+                let (right_inserted, right_increased) = node.right.insert_rec(key, value);
                 if !right_inserted {
                     *self = Some(node).into();
                     return (false, false);
                 }
                 node.size += 1;
-                if !right_changed {
+                if !right_increased {
                     *self = Some(node).into();
                     return (true, false);
                 }
