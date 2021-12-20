@@ -754,3 +754,81 @@ impl<K: Ord, V> FromIterator<(K, V)> for AVLTreeMap<K, V> {
         tree
     }
 }
+
+pub struct AVLTreeSet<K: Ord> {
+    root: NodePtr<K, ()>,
+}
+impl<K: Ord> AVLTreeSet<K> {
+    pub fn new() -> Self {
+        AVLTreeSet { root: None.into() }
+    }
+
+    pub fn insert(&mut self, key: K) -> bool {
+        self.root.insert(key, ())
+    }
+
+    pub fn remove(&mut self, key: &K) -> bool {
+        self.root.remove(key).is_some()
+    }
+
+    pub fn contains(&self, key: &K) -> bool {
+        self.root.search(key).is_some()
+    }
+
+    pub fn min(&self) -> Option<&K> {
+        self.root.min().map(|(k, _)| k)
+    }
+
+    pub fn max(&self) -> Option<&K> {
+        self.root.max().map(|(k, _)| k)
+    }
+
+    pub fn size(&self) -> usize {
+        self.root.size()
+    }
+
+    pub fn is_empty(&self) -> bool {
+        self.root.is_empty()
+    }
+
+    pub fn find_by_order(&self, order: usize) -> Option<&K> {
+        self.root.find_by_order(order).map(|(k, _)| k)
+    }
+
+    /**
+     * key 未満である要素の個数を返す
+     */
+    pub fn order_of_key(&self, key: &K) -> usize {
+        self.root.order_of_key(key)
+    }
+
+    pub fn keys(&self) -> Vec<&K> {
+        self.root.keys()
+    }
+}
+impl<'a, K: Ord> IntoIterator for &'a AVLTreeSet<K> {
+    type Item = &'a K;
+    type IntoIter = std::vec::IntoIter<Self::Item>;
+
+    fn into_iter(self) -> Self::IntoIter {
+        self.root
+            .into_iter()
+            .map(|(k, _)| k)
+            .collect::<Vec<_>>()
+            .into_iter()
+    }
+}
+impl<K: Ord> Default for AVLTreeSet<K> {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+impl<K: Ord> FromIterator<K> for AVLTreeSet<K> {
+    fn from_iter<T: IntoIterator<Item = K>>(iter: T) -> Self {
+        let mut tree = Self::new();
+        for key in iter {
+            tree.insert(key);
+        }
+        tree
+    }
+}
