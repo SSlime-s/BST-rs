@@ -1,7 +1,4 @@
-extern crate binary_search_tree;
-use binary_search_tree::{
-    avl_tree::{AVLTree},
-};
+use binary_search_tree::avl_tree::AVLTree;
 
 #[test]
 fn into_iter_test_empty() {
