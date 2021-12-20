@@ -307,8 +307,8 @@ impl<K: Ord, V> NodePtr<K, V> {
                     (Some((node.key, node.value)), true)
                 }
                 (Some(left), Some(right)) => {
-                    let left = left;
-                    let right = right;
+                    // 削除したいノードが子を2つ持っている場合
+                    // 左の子の最大値を消して 削除したいノードをそれに置き換える
                     let mut wrapped_left: NodePtr<_, _> = Some(left).into();
                     let (value, decreased) = wrapped_left.remove_max_rec();
                     let (mut key, mut value) = value.unwrap();
