@@ -1,3 +1,5 @@
+// verified by https://judge.yosupo.jp/submission/70311
+
 use std::ops::{Deref, DerefMut};
 
 use crate::tree_trait::BinarySearchTree;
