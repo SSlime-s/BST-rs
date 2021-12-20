@@ -673,12 +673,12 @@ where
     }
 }
 
-pub struct AVLTree<K: Ord, V> {
+pub struct AVLTreeMap<K: Ord, V> {
     root: NodePtr<K, V>,
 }
-impl<K: Ord, V> AVLTree<K, V> {
+impl<K: Ord, V> AVLTreeMap<K, V> {
     pub fn new() -> Self {
-        AVLTree { root: None.into() }
+        AVLTreeMap { root: None.into() }
     }
 
     pub fn insert(&mut self, key: K, value: V) -> bool {
@@ -732,7 +732,7 @@ impl<K: Ord, V> AVLTree<K, V> {
         self.root.values()
     }
 }
-impl<'a, K: Ord, V> IntoIterator for &'a AVLTree<K, V> {
+impl<'a, K: Ord, V> IntoIterator for &'a AVLTreeMap<K, V> {
     type Item = (&'a K, &'a V);
     type IntoIter = std::vec::IntoIter<Self::Item>;
 
@@ -740,12 +740,12 @@ impl<'a, K: Ord, V> IntoIterator for &'a AVLTree<K, V> {
         self.root.into_iter()
     }
 }
-impl<K: Ord, V> Default for AVLTree<K, V> {
+impl<K: Ord, V> Default for AVLTreeMap<K, V> {
     fn default() -> Self {
         Self::new()
     }
 }
-impl<K: Ord, V> FromIterator<(K, V)> for AVLTree<K, V> {
+impl<K: Ord, V> FromIterator<(K, V)> for AVLTreeMap<K, V> {
     fn from_iter<T: IntoIterator<Item = (K, V)>>(iter: T) -> Self {
         let mut tree = Self::new();
         for (key, value) in iter {

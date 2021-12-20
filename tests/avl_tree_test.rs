@@ -1,15 +1,15 @@
-use binary_search_tree::avl_tree::AVLTree;
+use binary_search_tree::avl_tree::AVLTreeMap;
 
 #[test]
 fn into_iter_test_empty() {
-    let tree: AVLTree<i32, i32> = AVLTree::new();
+    let tree: AVLTreeMap<i32, i32> = AVLTreeMap::new();
     let mut iter = tree.into_iter();
     assert_eq!(iter.next(), None);
 }
 
 #[test]
 fn insert_test() {
-    let mut tree = AVLTree::new();
+    let mut tree = AVLTreeMap::new();
     tree.insert(1, 1);
     tree.insert(2, 2);
     tree.insert(3, 3);
@@ -23,7 +23,7 @@ fn insert_test() {
 
 #[test]
 fn insert_test_confused() {
-    let mut tree = AVLTree::new();
+    let mut tree = AVLTreeMap::new();
     tree.insert(4, 4);
     tree.insert(1, 1);
     tree.insert(3, 3);
@@ -37,7 +37,7 @@ fn insert_test_confused() {
 
 #[test]
 fn insert_test_balanced() {
-    let mut tree = AVLTree::new();
+    let mut tree = AVLTreeMap::new();
     tree.insert(4, 4);
     tree.insert(2, 2);
     tree.insert(6, 6);
@@ -53,7 +53,7 @@ fn insert_test_balanced() {
 
 #[test]
 fn remove_test() {
-    let mut tree = AVLTree::new();
+    let mut tree = AVLTreeMap::new();
     tree.insert(1, 1);
     tree.insert(2, 2);
     tree.insert(3, 3);
@@ -68,7 +68,7 @@ fn remove_test() {
 
 #[test]
 fn remove_test_all() {
-    let mut tree = AVLTree::new();
+    let mut tree = AVLTreeMap::new();
     tree.insert(1, 1);
     tree.insert(2, 2);
     tree.insert(3, 3);
@@ -84,7 +84,7 @@ fn remove_test_all() {
 
 #[test]
 fn remove_test_confused() {
-    let mut tree = AVLTree::new();
+    let mut tree = AVLTreeMap::new();
     tree.insert(4, 4);
     tree.insert(1, 1);
     tree.insert(3, 3);
@@ -99,7 +99,7 @@ fn remove_test_confused() {
 
 #[test]
 fn remove_test_balanced() {
-    let mut tree = AVLTree::new();
+    let mut tree = AVLTreeMap::new();
     tree.insert(4, 4);
     tree.insert(2, 2);
     tree.insert(6, 6);
@@ -116,7 +116,7 @@ fn remove_test_balanced() {
 
 #[test]
 fn remove_test_not_exists() {
-    let mut tree = AVLTree::new();
+    let mut tree = AVLTreeMap::new();
     tree.insert(1, 1);
     tree.insert(2, 2);
     tree.insert(3, 3);
@@ -131,7 +131,7 @@ fn remove_test_not_exists() {
 
 #[test]
 fn get_test() {
-    let mut tree = AVLTree::new();
+    let mut tree = AVLTreeMap::new();
     tree.insert(1, 1);
     tree.insert(2, 2);
     tree.insert(3, 3);
@@ -142,7 +142,7 @@ fn get_test() {
 
 #[test]
 fn get_test_not_exists() {
-    let mut tree = AVLTree::new();
+    let mut tree = AVLTreeMap::new();
     tree.insert(1, 1);
     tree.insert(2, 2);
     tree.insert(3, 3);
@@ -153,7 +153,7 @@ fn get_test_not_exists() {
 
 #[test]
 fn get_test_confused() {
-    let mut tree = AVLTree::new();
+    let mut tree = AVLTreeMap::new();
     tree.insert(4, 4);
     tree.insert(1, 1);
     tree.insert(3, 3);
@@ -164,7 +164,7 @@ fn get_test_confused() {
 
 #[test]
 fn min_test() {
-    let mut tree = AVLTree::new();
+    let mut tree = AVLTreeMap::new();
     tree.insert(1, 1);
     tree.insert(2, 2);
     tree.insert(3, 3);
@@ -175,7 +175,7 @@ fn min_test() {
 
 #[test]
 fn min_test_confused() {
-    let mut tree = AVLTree::new();
+    let mut tree = AVLTreeMap::new();
     tree.insert(4, 4);
     tree.insert(1, 1);
     tree.insert(3, 3);
@@ -186,7 +186,7 @@ fn min_test_confused() {
 
 #[test]
 fn min_test_after_removed() {
-    let mut tree = AVLTree::new();
+    let mut tree = AVLTreeMap::new();
     tree.insert(1, 1);
     tree.insert(2, 2);
     tree.insert(3, 3);
@@ -198,13 +198,13 @@ fn min_test_after_removed() {
 
 #[test]
 fn min_test_empty() {
-    let tree: AVLTree<i32, i32> = AVLTree::new();
+    let tree: AVLTreeMap<i32, i32> = AVLTreeMap::new();
     assert_eq!(tree.min(), None);
 }
 
 #[test]
 fn max_test() {
-    let mut tree = AVLTree::new();
+    let mut tree = AVLTreeMap::new();
     tree.insert(1, 1);
     tree.insert(2, 2);
     tree.insert(3, 3);
@@ -215,7 +215,7 @@ fn max_test() {
 
 #[test]
 fn max_test_confused() {
-    let mut tree = AVLTree::new();
+    let mut tree = AVLTreeMap::new();
     tree.insert(4, 4);
     tree.insert(1, 1);
     tree.insert(3, 3);
@@ -226,7 +226,7 @@ fn max_test_confused() {
 
 #[test]
 fn max_test_after_removed() {
-    let mut tree = AVLTree::new();
+    let mut tree = AVLTreeMap::new();
     tree.insert(1, 1);
     tree.insert(2, 2);
     tree.insert(3, 3);
@@ -238,13 +238,13 @@ fn max_test_after_removed() {
 
 #[test]
 fn max_test_empty() {
-    let tree: AVLTree<i32, i32> = AVLTree::new();
+    let tree: AVLTreeMap<i32, i32> = AVLTreeMap::new();
     assert_eq!(tree.max(), None);
 }
 
 #[test]
 fn size_test() {
-    let mut tree = AVLTree::new();
+    let mut tree = AVLTreeMap::new();
     tree.insert(1, 1);
     tree.insert(2, 2);
     tree.insert(3, 3);
@@ -255,7 +255,7 @@ fn size_test() {
 
 #[test]
 fn size_test_after_removed() {
-    let mut tree = AVLTree::new();
+    let mut tree = AVLTreeMap::new();
     tree.insert(1, 1);
     tree.insert(2, 2);
     tree.insert(3, 3);
@@ -267,7 +267,7 @@ fn size_test_after_removed() {
 
 #[test]
 fn size_test_all_removed() {
-    let mut tree = AVLTree::new();
+    let mut tree = AVLTreeMap::new();
     tree.insert(1, 1);
     tree.insert(2, 2);
     tree.insert(3, 3);
@@ -283,13 +283,13 @@ fn size_test_all_removed() {
 
 #[test]
 fn size_test_empty() {
-    let tree: AVLTree<i32, i32> = AVLTree::new();
+    let tree: AVLTreeMap<i32, i32> = AVLTreeMap::new();
     assert_eq!(tree.size(), 0);
 }
 
 #[test]
 fn find_by_order_test() {
-    let mut tree = AVLTree::new();
+    let mut tree = AVLTreeMap::new();
     tree.insert(1, 1);
     tree.insert(2, 2);
     tree.insert(3, 3);
@@ -305,7 +305,7 @@ fn find_by_order_test() {
 
 #[test]
 fn find_by_order_test_confused() {
-    let mut tree = AVLTree::new();
+    let mut tree = AVLTreeMap::new();
     tree.insert(4, 4);
     tree.insert(1, 1);
     tree.insert(3, 3);
@@ -321,7 +321,7 @@ fn find_by_order_test_confused() {
 
 #[test]
 fn find_by_order_test_after_removed() {
-    let mut tree = AVLTree::new();
+    let mut tree = AVLTreeMap::new();
     tree.insert(1, 1);
     tree.insert(2, 2);
     tree.insert(3, 3);
@@ -337,7 +337,7 @@ fn find_by_order_test_after_removed() {
 
 #[test]
 fn order_of_key_test() {
-    let mut tree = AVLTree::new();
+    let mut tree = AVLTreeMap::new();
     tree.insert(1, 1);
     tree.insert(2, 2);
     tree.insert(4, 3);
@@ -354,7 +354,7 @@ fn order_of_key_test() {
 
 #[test]
 fn order_of_key_test_after_removed() {
-    let mut tree = AVLTree::new();
+    let mut tree = AVLTreeMap::new();
     tree.insert(1, 1);
     tree.insert(2, 2);
     tree.insert(4, 3);
@@ -371,7 +371,7 @@ fn order_of_key_test_after_removed() {
 
 #[test]
 fn order_of_key_test_all_removed() {
-    let mut tree = AVLTree::new();
+    let mut tree = AVLTreeMap::new();
     tree.insert(1, 1);
     tree.insert(2, 2);
     tree.insert(4, 3);
