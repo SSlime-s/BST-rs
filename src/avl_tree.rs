@@ -3,7 +3,7 @@ use std::ops::{Deref, DerefMut};
 use crate::tree_trait::BinarySearchTree;
 
 #[derive(Clone, Copy, PartialEq)]
-enum ThreeWay {
+pub enum ThreeWay {
     Left,
     Right,
     Equal,
@@ -267,12 +267,12 @@ impl<K: Ord, V> NodePtr<K, V> {
                                 if let Some(mut left) = node.left.0.as_mut() {
                                     left.state = match state {
                                         ThreeWay::Left | ThreeWay::Equal => ThreeWay::Equal,
-                                        ThreeWay::Right => ThreeWay::Right,
+                                        ThreeWay::Right => ThreeWay::Left,
                                     };
                                 }
                                 if let Some(mut right) = node.right.0.as_mut() {
                                     right.state = match state {
-                                        ThreeWay::Left => ThreeWay::Left,
+                                        ThreeWay::Left => ThreeWay::Right,
                                         ThreeWay::Right | ThreeWay::Equal => ThreeWay::Equal,
                                     };
                                 }
@@ -317,11 +317,26 @@ impl<K: Ord, V> NodePtr<K, V> {
                     node.size -= 1;
                     node.left = wrapped_left;
                     node.right = Some(right).into();
-                    if decreased {
-                        node.state = ThreeWay::Right;
+                    match node.state {
+                        _ if !decreased => {
+                            *self = Some(node).into();
+                            (Some((key, value)), false)
+                        }
+                        ThreeWay::Equal => {
+                            node.state = ThreeWay::Right;
+                            *self = Some(node).into();
+                            (Some((key, value)), false)
+                        }
+                        ThreeWay::Left => {
+                            node.state = ThreeWay::Equal;
+                            *self = Some(node).into();
+                            (Some((key, value)), true)
+                        }
+                        ThreeWay::Right => {
+                            *self = Some(node).into();
+                            (Some((key, value)), self.rebalanced_for_left_remove())
+                        }
                     }
-                    *self = Some(node).into();
-                    (Some((key, value)), false)
                 }
             },
             std::cmp::Ordering::Greater => {
@@ -435,11 +450,11 @@ impl<K: Ord, V> NodePtr<K, V> {
                 let mut wrapped_node: NodePtr<_, _> = Some(node).into();
                 wrapped_node.rotate_left();
                 let mut node = wrapped_node.0.take().unwrap();
-                node.state = ThreeWay::Equal;
+                node.state = ThreeWay::Left;
                 *self = Some(node).into();
                 false
             }
-            ThreeWay::Left => {
+            ThreeWay::Right => {
                 let mut wrapped_node: NodePtr<_, _> = Some(node).into();
                 wrapped_node.rotate_left();
                 let mut node = wrapped_node.0.take().unwrap();
@@ -450,7 +465,7 @@ impl<K: Ord, V> NodePtr<K, V> {
                 *self = Some(node).into();
                 true
             }
-            ThreeWay::Right => {
+            ThreeWay::Left => {
                 let state = node
                     .right
                     .0
@@ -469,12 +484,12 @@ impl<K: Ord, V> NodePtr<K, V> {
                 if let Some(mut left) = node.left.0.as_mut() {
                     left.state = match state {
                         ThreeWay::Left | ThreeWay::Equal => ThreeWay::Equal,
-                        ThreeWay::Right => ThreeWay::Right,
+                        ThreeWay::Right => ThreeWay::Left,
                     };
                 }
                 if let Some(mut right) = node.right.0.as_mut() {
                     right.state = match state {
-                        ThreeWay::Left => ThreeWay::Left,
+                        ThreeWay::Left => ThreeWay::Right,
                         ThreeWay::Right | ThreeWay::Equal => ThreeWay::Equal,
                     };
                 }
@@ -494,7 +509,7 @@ impl<K: Ord, V> NodePtr<K, V> {
                 let mut wrapped_node: NodePtr<_, _> = Some(node).into();
                 wrapped_node.rotate_right();
                 let mut node = wrapped_node.0.take().unwrap();
-                node.state = ThreeWay::Equal;
+                node.state = ThreeWay::Right;
                 *self = Some(node).into();
                 false
             }
