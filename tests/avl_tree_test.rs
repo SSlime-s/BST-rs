@@ -1,5 +1,8 @@
 extern crate binary_search_tree;
-use binary_search_tree::{avl_tree::AVLTree, tree_trait::BinarySearchTree};
+use binary_search_tree::{
+    avl_tree::{AVLTree, ThreeWay},
+    tree_trait::BinarySearchTree,
+};
 
 #[test]
 fn into_iter_test_empty() {
