@@ -1,7 +1,6 @@
 extern crate binary_search_tree;
 use binary_search_tree::{
-    avl_tree::{AVLTree, ThreeWay},
-    tree_trait::BinarySearchTree,
+    avl_tree::{AVLTree},
 };
 
 #[test]
@@ -134,36 +133,36 @@ fn remove_test_not_exists() {
 }
 
 #[test]
-fn search_test() {
+fn get_test() {
     let mut tree = AVLTree::new();
     tree.insert(1, 1);
     tree.insert(2, 2);
     tree.insert(3, 3);
     tree.insert(4, 4);
     tree.insert(5, 5);
-    assert_eq!(tree.search(&4), Some(&4));
+    assert_eq!(tree.get(&4), Some(&4));
 }
 
 #[test]
-fn search_test_not_exists() {
+fn get_test_not_exists() {
     let mut tree = AVLTree::new();
     tree.insert(1, 1);
     tree.insert(2, 2);
     tree.insert(3, 3);
     tree.insert(4, 4);
     tree.insert(5, 5);
-    assert_eq!(tree.search(&6), None);
+    assert_eq!(tree.get(&6), None);
 }
 
 #[test]
-fn search_test_confused() {
+fn get_test_confused() {
     let mut tree = AVLTree::new();
     tree.insert(4, 4);
     tree.insert(1, 1);
     tree.insert(3, 3);
     tree.insert(2, 2);
     tree.insert(5, 5);
-    assert_eq!(tree.search(&4), Some(&4));
+    assert_eq!(tree.get(&4), Some(&4));
 }
 
 #[test]

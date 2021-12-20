@@ -1,8 +1,6 @@
 // verified by https://judge.yosupo.jp/submission/70311
 
-use std::ops::{Deref, DerefMut};
-
-use crate::tree_trait::BinarySearchTree;
+use std::iter::FromIterator;
 
 #[derive(Clone, Copy, PartialEq)]
 pub enum ThreeWay {
@@ -11,9 +9,9 @@ pub enum ThreeWay {
     Equal,
 }
 
-pub type NodePtrInner<K, V> = Option<Box<Node<K, V>>>;
-pub struct NodePtr<K, V>(NodePtrInner<K, V>);
-pub struct Node<K, V> {
+type NodePtrInner<K, V> = Option<Box<Node<K, V>>>;
+struct NodePtr<K, V>(NodePtrInner<K, V>);
+struct Node<K, V> {
     key: K,
     value: V,
     left: NodePtr<K, V>,
@@ -63,6 +61,10 @@ impl<K, V> NodePtr<K, V> {
         self.0.as_ref().map_or(0, |node| node.size)
     }
 
+    fn is_empty(&self) -> bool {
+        self.0.is_none()
+    }
+
     fn rotate_right(&mut self) {
         let mut node = match self.0.take() {
             Some(node) => node,
@@ -105,7 +107,7 @@ impl<K, V> NodePtr<K, V> {
         *self = Some(right).into();
     }
 
-    pub fn keys(&self) -> Vec<&K> {
+    fn keys(&self) -> Vec<&K> {
         let mut vec = Vec::new();
         if let Some(node) = &self.0 {
             vec.extend(node.left.keys());
@@ -115,7 +117,7 @@ impl<K, V> NodePtr<K, V> {
         vec
     }
 
-    pub fn values(&self) -> Vec<&V> {
+    fn values(&self) -> Vec<&V> {
         let mut vec = Vec::new();
         if let Some(node) = &self.0 {
             vec.extend(node.left.values());
@@ -561,7 +563,7 @@ impl<K: Ord, V> NodePtr<K, V> {
     }
 }
 
-impl<K, V> BinarySearchTree<K, V> for NodePtr<K, V>
+impl<K, V> NodePtr<K, V>
 where
     K: Ord,
 {
@@ -619,14 +621,6 @@ where
         }
     }
 
-    fn size(&self) -> usize {
-        self.size()
-    }
-
-    fn is_empty(&self) -> bool {
-        self.0.is_none()
-    }
-
     fn find_by_order(&self, order: usize) -> Option<(&K, &V)> {
         if self.size() <= order {
             return None;
@@ -682,20 +676,68 @@ where
 pub struct AVLTree<K: Ord, V> {
     root: NodePtr<K, V>,
 }
-impl<K: Ord, V> Deref for AVLTree<K, V> {
-    type Target = NodePtr<K, V>;
-    fn deref(&self) -> &Self::Target {
-        &self.root
-    }
-}
-impl<K: Ord, V> DerefMut for AVLTree<K, V> {
-    fn deref_mut(&mut self) -> &mut Self::Target {
-        &mut self.root
-    }
-}
 impl<K: Ord, V> AVLTree<K, V> {
     pub fn new() -> Self {
         AVLTree { root: None.into() }
+    }
+
+    pub fn insert(&mut self, key: K, value: V) -> bool {
+        self.root.insert(key, value)
+    }
+
+    pub fn remove(&mut self, key: &K) -> Option<V> {
+        self.root.remove(key)
+    }
+
+    pub fn get(&self, key: &K) -> Option<&V> {
+        self.root.search(key)
+    }
+
+    pub fn get_mut(&mut self, key: &K) -> Option<&mut V> {
+        self.root.search_mut(key)
+    }
+
+    pub fn min(&self) -> Option<(&K, &V)> {
+        self.root.min()
+    }
+
+    pub fn max(&self) -> Option<(&K, &V)> {
+        self.root.max()
+    }
+
+    pub fn size(&self) -> usize {
+        self.root.size()
+    }
+
+    pub fn is_empty(&self) -> bool {
+        self.root.is_empty()
+    }
+
+    pub fn find_by_order(&self, order: usize) -> Option<(&K, &V)> {
+        self.root.find_by_order(order)
+    }
+
+    /**
+     * key 未満である要素の個数を返す
+     */
+    pub fn order_of_key(&self, key: &K) -> usize {
+        self.root.order_of_key(key)
+    }
+
+    pub fn keys(&self) -> Vec<&K> {
+        self.root.keys()
+    }
+
+    pub fn values(&self) -> Vec<&V> {
+        self.root.values()
+    }
+}
+impl<'a, K: Ord, V> IntoIterator for &'a AVLTree<K, V> {
+    type Item = (&'a K, &'a V);
+    type IntoIter = std::vec::IntoIter<Self::Item>;
+
+    fn into_iter(self) -> Self::IntoIter {
+        self.root.into_iter()
     }
 }
 impl<K: Ord, V> Default for AVLTree<K, V> {
