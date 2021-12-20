@@ -53,6 +53,10 @@ impl<K, V> From<NodePtrInner<K, V>> for NodePtr<K, V> {
     }
 }
 impl<K, V> NodePtr<K, V> {
+    fn new(key: K, value: V) -> Self {
+        NodePtr(Some(Box::new(Node::new(key, value))))
+    }
+
     fn size(&self) -> usize {
         self.0.as_ref().map_or(0, |node| node.size)
     }
@@ -125,7 +129,7 @@ impl<K: Ord, V> NodePtr<K, V> {
         let mut node = match self.0.take() {
             Some(node) => node,
             None => {
-                *self = Some(Box::new(Node::new(key, value))).into();
+                *self = NodePtr::new(key, value);
                 return (true, true);
             }
         };
