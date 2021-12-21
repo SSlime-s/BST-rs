@@ -2,6 +2,8 @@
 
 use std::iter::FromIterator;
 
+use crate::node::NodeTrait;
+
 #[derive(Clone, Copy, PartialEq)]
 pub enum ThreeWay {
     Left,
@@ -30,6 +32,39 @@ impl<K, V> Node<K, V> {
             size: 1,
             state: ThreeWay::Equal,
         }
+    }
+}
+impl<K, V> NodeTrait for Node<K, V> {
+    fn size(&self) -> usize {
+        self.size
+    }
+
+    fn size_mut(&mut self) -> &mut usize {
+        &mut self.size
+    }
+
+    fn left(&self) -> Option<&Self> {
+        self.left.0.as_deref()
+    }
+
+    fn right(&self) -> Option<&Self> {
+        self.right.0.as_deref()
+    }
+
+    fn take_left(&mut self) -> Option<Box<Self>> {
+        self.left.0.take()
+    }
+
+    fn take_right(&mut self) -> Option<Box<Self>> {
+        self.right.0.take()
+    }
+
+    fn set_left(&mut self, node: Option<Box<Self>>) {
+        self.left.0 = node;
+    }
+
+    fn set_right(&mut self, node: Option<Box<Self>>) {
+        self.right.0 = node;
     }
 }
 
@@ -63,48 +98,6 @@ impl<K, V> NodePtr<K, V> {
 
     fn is_empty(&self) -> bool {
         self.0.is_none()
-    }
-
-    fn rotate_right(&mut self) {
-        let mut node = match self.0.take() {
-            Some(node) => node,
-            None => return,
-        };
-
-        let mut left = match node.left.0.take() {
-            Some(left) => left,
-            None => return,
-        };
-
-        let node_size = node.size;
-        node.size = node.size - left.size + left.right.size();
-        node.left = left.right.0.take().into();
-
-        left.size = node_size;
-        left.right = Some(node).into();
-
-        *self = Some(left).into();
-    }
-
-    fn rotate_left(&mut self) {
-        let mut node = match self.0.take() {
-            Some(node) => node,
-            None => return,
-        };
-
-        let mut right = match node.right.0.take() {
-            Some(right) => right,
-            None => return,
-        };
-
-        let node_size = node.size;
-        node.size = node.size - right.size + right.left.size();
-        node.right = right.left.0.take().into();
-
-        right.size = node_size;
-        right.left = Some(node).into();
-
-        *self = Some(right).into();
     }
 
     fn keys(&self) -> Vec<&K> {
@@ -160,9 +153,7 @@ impl<K: Ord, V> NodePtr<K, V> {
                     ThreeWay::Left => {
                         match node.left.0.as_ref().unwrap().state {
                             ThreeWay::Left => {
-                                let mut wrapped_node: NodePtr<_, _> = Some(node).into();
-                                wrapped_node.rotate_right();
-                                let mut node = wrapped_node.0.take().unwrap();
+                                node.rotate_right();
                                 node.state = ThreeWay::Equal;
                                 if let Some(mut right) = node.right.0.as_mut() {
                                     right.state = ThreeWay::Equal;
@@ -180,10 +171,8 @@ impl<K: Ord, V> NodePtr<K, V> {
                                     .as_ref()
                                     .unwrap()
                                     .state;
-                                node.left.rotate_left();
-                                let mut wrapped_node: NodePtr<_, _> = Some(node).into();
-                                wrapped_node.rotate_right();
-                                let mut node = wrapped_node.0.take().unwrap();
+                                node.left.0.as_mut().unwrap().rotate_left();
+                                node.rotate_right();
                                 node.state = ThreeWay::Equal;
                                 if let Some(mut right) = node.right.0.as_mut() {
                                     right.state = match state {
@@ -243,9 +232,7 @@ impl<K: Ord, V> NodePtr<K, V> {
                     ThreeWay::Right => {
                         match node.right.0.as_ref().unwrap().state {
                             ThreeWay::Right => {
-                                let mut wrapped_node: NodePtr<_, _> = Some(node).into();
-                                wrapped_node.rotate_left();
-                                let mut node = wrapped_node.0.take().unwrap();
+                                node.rotate_left();
                                 node.state = ThreeWay::Equal;
                                 if let Some(mut left) = node.left.0.as_mut() {
                                     left.state = ThreeWay::Equal;
@@ -263,10 +250,8 @@ impl<K: Ord, V> NodePtr<K, V> {
                                     .as_ref()
                                     .unwrap()
                                     .state;
-                                node.right.rotate_right();
-                                let mut wrapped_node: NodePtr<_, _> = Some(node).into();
-                                wrapped_node.rotate_left();
-                                let mut node = wrapped_node.0.take().unwrap();
+                                node.right.0.as_mut().unwrap().rotate_right();
+                                node.rotate_left();
                                 node.state = ThreeWay::Equal;
                                 if let Some(mut left) = node.left.0.as_mut() {
                                     left.state = match state {
@@ -451,17 +436,13 @@ impl<K: Ord, V> NodePtr<K, V> {
         let right_state = node.right.0.as_ref().unwrap().state;
         match right_state {
             ThreeWay::Equal => {
-                let mut wrapped_node: NodePtr<_, _> = Some(node).into();
-                wrapped_node.rotate_left();
-                let mut node = wrapped_node.0.take().unwrap();
+                node.rotate_left();
                 node.state = ThreeWay::Left;
                 *self = Some(node).into();
                 false
             }
             ThreeWay::Right => {
-                let mut wrapped_node: NodePtr<_, _> = Some(node).into();
-                wrapped_node.rotate_left();
-                let mut node = wrapped_node.0.take().unwrap();
+                node.rotate_left();
                 node.state = ThreeWay::Equal;
                 if let Some(mut left) = node.left.0.as_mut() {
                     left.state = ThreeWay::Equal;
@@ -480,10 +461,8 @@ impl<K: Ord, V> NodePtr<K, V> {
                     .as_ref()
                     .unwrap()
                     .state;
-                node.right.rotate_right();
-                let mut wrapped_node: NodePtr<_, _> = Some(node).into();
-                wrapped_node.rotate_left();
-                let mut node = wrapped_node.0.take().unwrap();
+                node.right.0.as_mut().unwrap().rotate_right();
+                node.rotate_left();
                 node.state = ThreeWay::Equal;
                 if let Some(mut left) = node.left.0.as_mut() {
                     left.state = match state {
@@ -510,17 +489,13 @@ impl<K: Ord, V> NodePtr<K, V> {
         let left_state = node.left.0.as_ref().unwrap().state;
         match left_state {
             ThreeWay::Equal => {
-                let mut wrapped_node: NodePtr<_, _> = Some(node).into();
-                wrapped_node.rotate_right();
-                let mut node = wrapped_node.0.take().unwrap();
+                node.rotate_right();
                 node.state = ThreeWay::Right;
                 *self = Some(node).into();
                 false
             }
             ThreeWay::Left => {
-                let mut wrapped_node: NodePtr<_, _> = Some(node).into();
-                wrapped_node.rotate_right();
-                let mut node = wrapped_node.0.take().unwrap();
+                node.rotate_right();
                 node.state = ThreeWay::Equal;
                 if let Some(mut right) = node.right.0.as_mut() {
                     right.state = ThreeWay::Equal;
@@ -539,10 +514,8 @@ impl<K: Ord, V> NodePtr<K, V> {
                     .as_ref()
                     .unwrap()
                     .state;
-                node.left.rotate_left();
-                let mut wrapped_node: NodePtr<_, _> = Some(node).into();
-                wrapped_node.rotate_right();
-                let mut node = wrapped_node.0.take().unwrap();
+                node.left.0.as_mut().unwrap().rotate_left();
+                node.rotate_right();
                 node.state = ThreeWay::Equal;
                 if let Some(mut left) = node.left.0.as_mut() {
                     left.state = match state {
