@@ -58,6 +58,11 @@ impl<K: Ord, V> Node<K, V> {
         }
     }
 
+    // TODO: これてきとうにパクってきたけど index base だから merge うまくいかんきがする
+    // merge/split base じゃなくて insert/remove base にしないとだめかも
+    // 単に merge するんじゃなくて、split してから merge を繰り返せばいける？
+    // これだと merge に要素数分かかっちゃうな
+    // 困った
     fn merge(&mut self, mut other: Self) {
         if self.priority > other.priority {
             self.size += other.size;
