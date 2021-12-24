@@ -116,3 +116,16 @@ impl<K: Ord, V> NodePtr<K, V> {
     }
 }
 
+pub struct Treap<K: Ord, V> {
+    root: NodePtr<K, V>,
+}
+impl<K: Ord, V> Treap<K, V> {
+    pub fn new() -> Self {
+        Treap { root: NodePtr(None) }
+    }
+}
+impl<K: Ord, V> Default for Treap<K, V> {
+    fn default() -> Self {
+        Self::new()
+    }
+}
