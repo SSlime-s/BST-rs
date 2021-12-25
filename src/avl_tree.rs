@@ -4,7 +4,7 @@ use std::iter::FromIterator;
 
 use crate::node::NodeTrait;
 
-#[derive(Clone, Copy, PartialEq)]
+#[derive(Clone, Copy, PartialEq, Debug)]
 pub enum ThreeWay {
     Left,
     Right,
