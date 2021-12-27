@@ -57,58 +57,6 @@ impl<K: Ord, V> Node<K, V> {
             priority: random::<f64>(),
         }
     }
-
-    // TODO: これてきとうにパクってきたけど index base だから merge うまくいかんきがする
-    // merge/split base じゃなくて insert/remove base にしないとだめかも
-    // 単に merge するんじゃなくて、split してから merge を繰り返せばいける？
-    // これだと merge に要素数分かかっちゃうな
-    // 困った
-    fn merge(&mut self, mut other: Self) {
-        if self.priority > other.priority {
-            self.size += other.size;
-            if let Some(mut right) = self.take_right() {
-                right.merge(other);
-                self.set_right(Some(right));
-            } else {
-                self.set_right(Some(Box::new(other)));
-            }
-        } else {
-            std::mem::swap(self, &mut other);
-            self.size += other.size;
-            if let Some(mut left) = self.take_left() {
-                left.merge(other);
-                self.set_left(Some(left));
-            } else {
-                self.set_left(Some(Box::new(other)));
-            }
-        }
-    }
-
-    /**
-     * (-∞, k) [k, +∞) に分割
-     */
-    fn split(mut self, key: &K) -> (Option<Self>, Option<Self>) {
-        match self.key.cmp(key) {
-            std::cmp::Ordering::Equal | std::cmp::Ordering::Greater => {
-                let right = match self.take_right() {
-                    Some(right) => right,
-                    None => return (Some(self), None),
-                };
-                let (less, greater) = right.split(key);
-                self.set_right(less.map(Box::new));
-                (Some(self), greater)
-            }
-            std::cmp::Ordering::Less => {
-                let left = match self.take_left() {
-                    Some(left) => left,
-                    None => return (None, Some(self)),
-                };
-                let (less, greater) = left.split(key);
-                self.set_left(greater.map(Box::new));
-                (less, Some(self))
-            }
-        }
-    }
 }
 impl<K: Ord, V> NodePtr<K, V> {
     fn new(key: K, value: V) -> Self {
